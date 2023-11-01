@@ -18,6 +18,8 @@ Manager::~Manager(){}
 /// <returns></returns>
 void Manager::Game()
 {
+	cout << "Welcome to Hexapawn game!!!" << endl << endl;
+
 	while (1)
 	{
 		try {
@@ -30,15 +32,13 @@ void Manager::Game()
 			int turn = 0;
 			int eval = 0;
 
-			cout << "Welcome to Hexapawn game!!!" << endl << endl;
-
 			// 1) pawn 색깔 선택
 			cout << "Type ""WHITE"" or ""BLACK"": ";
 			cin >> buf;
 
 			if (strcmp(buf, "WHITE") != 0 && strcmp(buf, "BLACK") != 0)
 			{
-				throw invalid_argument("제대로 입력해주세요.");
+				throw invalid_argument("제대로 입력해주세요.\n");
 			}
 
 			else
@@ -70,7 +70,7 @@ void Manager::Game()
 
 			if (turn != 1 && turn != 2)
 			{
-				throw invalid_argument("제대로 입력해주세요.");
+				throw invalid_argument("제대로 입력해주세요.\n");
 			}
 
 			else
@@ -102,7 +102,7 @@ void Manager::Game()
 			if (initialSetting(gametree, buf))
 			{
 				print_state(gametree);
-				char com_color = gametree->getRoot()->get_com_color();		//게임 시작 때 computer가 움직이고 나서 computer의 원래 색을 맞추기 위함
+				char com_color = gametree->getRoot()->get_com_color();
 
 				cout << endl << endl;
 
@@ -219,7 +219,7 @@ void Manager::Game()
 
 					else
 					{
-						cout << "다시 입력해주시기 바랍니다." << endl;		//그 이외 선택 시에도 게임 종료
+						cout << "다시 입력해주시기 바랍니다.\n" << endl;		//그 이외 선택 시에도 게임 종료
 					}
 				}
 			}
@@ -239,7 +239,7 @@ void Manager::Game()
 
 int Manager::Move_User_pawn(gameTree* pawn)
 {
-	gameTreeNode* pc_Root = pawn->getRoot();			//current Node
+	gameTreeNode* pc_Root = pawn->getRoot();
 
 	int turn = 0;
 	int term_value = 0;
@@ -441,7 +441,7 @@ bool Manager::initialSetting(gameTree* pawn, char* file_name)
 	else
 	{
 		if (fp == NULL)	//파일이 존재 X
-			throw exception("파일이 존재하지 않습니다.");
+			throw exception("파일이 존재하지 않습니다.\n");
 
 		for (int i = 0; i < 3; i++)
 		{
