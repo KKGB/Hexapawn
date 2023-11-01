@@ -4,6 +4,6 @@ using namespace std;
 int main()
 {
 	Manager manager;
-	manager.Game();		//게임 시작
+	manager.Game();
 	return 0;
 }

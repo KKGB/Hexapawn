@@ -20,217 +20,219 @@ void Manager::Game()
 {
 	while (1)
 	{
-		gametree = new gameTree();		// minimax Tree 생성
-		gameTreeNode* newNode = new gameTreeNode();		// 노드 생성
-		gametree->setRoot(newNode);
-		gametree->set_pCur(newNode);
+		try {
+			gametree = new gameTree();		// minimax Tree 생성
+			gameTreeNode* newNode = new gameTreeNode();		// 노드 생성
+			gametree->setRoot(newNode);
+			gametree->set_pCur(newNode);
 
-		char buf[20] = { 0 };
-		int turn = 0;
-		int eval = 0;
+			char buf[20] = { 0 };
+			int turn = 0;
+			int eval = 0;
 
-		cout << "Welcome to Hexapawn game!!!" << endl << endl;
+			cout << "Welcome to Hexapawn game!!!" << endl << endl;
 
-		// 1) pawn 색깔 선택
-		cout << "Type ""WHITE"" or ""BLACK"": ";
-		cin >> buf;
+			// 1) pawn 색깔 선택
+			cout << "Type ""WHITE"" or ""BLACK"": ";
+			cin >> buf;
 
-		if (strcmp(buf, "WHITE") != 0 && strcmp(buf, "BLACK") != 0)
-		{
-			cout << "색깔을 제대로 선택하지 않았습니다. 프로그램 종료합니다." << endl;
-			return;
-		}
-
-		else
-		{
-			// User : 흰, Com : 검
-			if (strcmp(buf, "WHITE") == 0)
+			if (strcmp(buf, "WHITE") != 0 && strcmp(buf, "BLACK") != 0)
 			{
-				cout << "WHITE : USER / BLACK : COMPUTER" << endl;
-				set_user_color('W');
-				gametree->getRoot()->set_com_color('B');
-			}
-
-			// User : 검, Com : 흰
-			else
-			{
-				cout << "BLACK : USER / WHITE : COMPUTER" << endl;
-				set_user_color('B');
-				gametree->getRoot()->set_com_color('W');
-			}
-
-			cout << endl;
-		}
-
-
-
-		// 2) 선공 후공 선택
-		cout << "WHITE first (1) BLACK first (2): ";
-		cin >> turn;
-
-		if (turn != 1 && turn != 2)
-		{
-			cout << "순서를 제대로 선택하지 않았습니다. 프로그램을 종료합니다." << endl;
-			return;
-		}
-
-		else
-		{
-			// 유저 선공
-			if ((turn == 1 && strcmp(buf, "WHITE") == 0) || (turn == 2 && strcmp(buf, "BLACK") == 0))
-			{
-				cout << "User first!!!" << endl;
-				if (turn == 1) set_user_turn(1);
-				else set_user_turn(2);
-			}
-
-			// 컴퓨터 선공
-			else
-			{
-				cout << "Computer first!!!" << endl;
-				if (turn == 1) set_user_turn(1);
-				else set_user_turn(2);
-			}
-
-			cout << endl;
-		}
-
-		// 3) 초기 보드 상태 설정
-		memset(buf, 0, sizeof(buf));
-		cout << "Input file name (default board=0): ";
-		cin >> buf;
-
-		if (!initialSetting(gametree, buf))
-		{
-			cout << "파일이 존재하지 않습니다. 프로그램을 종료합니다." << endl;
-			return;
-		}
-
-		print_state(gametree);
-		char com_color = gametree->getRoot()->get_com_color();		//게임 시작 때 computer가 움직이고 나서 computer의 원래 색을 맞추기 위함
-
-		cout << endl << endl;
-
-		// 4-1) 유저 선공
-		if ((get_user_color() == 'W' && get_user_turn() == 1) || ((get_user_color() == 'B') && get_user_turn() == 2))
-		{
-			while (eval != 100 && eval != -100)
-			{
-				//유저 차례
-				eval = Move_User_pawn(gametree);		//유저 말 이동
-
-				cout << "=========================" << endl;
-				cout << "USER" << endl;
-				print_state(gametree);					//보드 출력
-
-				if (eval == 100 || eval == -100)		//종료 조건
-					break;
-				cout << "=========================" << endl << endl;
-
-				//컴퓨터 차례
-				cout << "==========================" << endl;
-				cout << "COMPUTER" << endl;
-
-				eval = Move_Com_pawn(gametree);			//컴퓨터 말 이동
-				gametree->getRoot()->set_com_color(com_color);	//컴퓨터의 원래 진영 색 설정
-				print_state(gametree);					//보드 출력
-
-				if (eval == 100 || eval == -100)		//종료 조건
-					break;
-				cout << "=========================" << endl << endl;
-			}
-		}
-
-		// 4-2) 컴퓨터 선공
-		else
-		{
-			while (eval != 100 && eval != -100)
-			{
-				//컴퓨터 차례
-				cout << "===================================================" << endl;
-				cout << "COMPUTER" << endl;
-
-				eval = Move_Com_pawn(gametree);			//컴퓨터 말 이동
-				gametree->getRoot()->set_com_color(com_color);	//컴퓨터의 원래 진영 색 설정
-				print_state(gametree);					//보드 출력
-
-				if (eval == 100 || eval == -100)		//종료 조건
-					break;
-
-				cout << "===================================================" << endl << endl;
-
-
-				//유저 차례
-				eval = Move_User_pawn(gametree);		//유저 말 이동
-
-				cout << "===================================================" << endl;
-				cout << "USER" << endl;
-				print_state(gametree);					//보드 출력
-
-				if (eval == 100 || eval == -100)		//종료 조건
-					break;
-				cout << "===================================================" << endl << endl;
-			}
-
-		}
-
-
-		cout << "게임종료 -- ";
-
-
-		if (eval == 100)
-		{
-			if (get_user_color() == 'B')
-			{
-				cout << "HUMAN LOSS" << endl;
-
-			}
-			else
-			{
-				cout << "HUMAN WIN" << endl;
-			}
-		}
-		else	//eval == -100
-		{
-			if (get_user_color() == 'B')
-			{
-				cout << "HUMAN WIN" << endl;
-			}
-			else
-			{
-				cout << "HUMAN LOSE" << endl;
-			}
-		}
-
-
-		while (1)
-		{
-			int again = 0;
-			cout << "Play more (1), Exit (2) : ";
-			cin >> again;
-
-			if (again == 1)
-			{
-				delete gametree;		//1을 선택 시 게임 다시 진행
-				system("cls");
-				break;
-			}
-
-			else if (again == 2)
-			{
-				delete gametree;		//2를 선택 시 게임 종료
-				return;
+				throw invalid_argument("제대로 입력해주세요.");
 			}
 
 			else
 			{
-				cout << "잘못 입력했기 때문에 게임 종료하겠습니다." << endl;		//그 이외 선택 시에도 게임 종료
-				delete gametree;
-				return;
+				// User : 흰, Com : 검
+				if (strcmp(buf, "WHITE") == 0)
+				{
+					cout << "WHITE : USER / BLACK : COMPUTER" << endl;
+					set_user_color('W');
+					gametree->getRoot()->set_com_color('B');
+				}
+
+				// User : 검, Com : 흰
+				else
+				{
+					cout << "BLACK : USER / WHITE : COMPUTER" << endl;
+					set_user_color('B');
+					gametree->getRoot()->set_com_color('W');
+				}
+
+				cout << endl;
+			}
+
+
+
+			// 2) 선공 후공 선택
+			cout << "WHITE first (1) BLACK first (2): ";
+			cin >> turn;
+
+			if (turn != 1 && turn != 2)
+			{
+				throw invalid_argument("제대로 입력해주세요.");
+			}
+
+			else
+			{
+				// 유저 선공
+				if ((turn == 1 && strcmp(buf, "WHITE") == 0) || (turn == 2 && strcmp(buf, "BLACK") == 0))
+				{
+					cout << "User first!!!" << endl;
+					if (turn == 1) set_user_turn(1);
+					else set_user_turn(2);
+				}
+
+				// 컴퓨터 선공
+				else
+				{
+					cout << "Computer first!!!" << endl;
+					if (turn == 1) set_user_turn(1);
+					else set_user_turn(2);
+				}
+
+				cout << endl;
+			}
+
+			// 3) 초기 보드 상태 설정
+			memset(buf, 0, sizeof(buf));
+			cout << "Input file name (default board=0): ";
+			cin >> buf;
+
+			if (initialSetting(gametree, buf))
+			{
+				print_state(gametree);
+				char com_color = gametree->getRoot()->get_com_color();		//게임 시작 때 computer가 움직이고 나서 computer의 원래 색을 맞추기 위함
+
+				cout << endl << endl;
+
+				// 4-1) 유저 선공
+				if ((get_user_color() == 'W' && get_user_turn() == 1) || ((get_user_color() == 'B') && get_user_turn() == 2))
+				{
+					while (eval != 100 && eval != -100)
+					{
+						//유저 차례
+						eval = Move_User_pawn(gametree);		//유저 말 이동
+
+						cout << "=========================" << endl;
+						cout << "USER" << endl;
+						print_state(gametree);					//보드 출력
+
+						if (eval == 100 || eval == -100)		//종료 조건
+							break;
+						cout << "=========================" << endl << endl;
+
+						//컴퓨터 차례
+						cout << "==========================" << endl;
+						cout << "COMPUTER" << endl;
+
+						eval = Move_Com_pawn(gametree);			//컴퓨터 말 이동
+						gametree->getRoot()->set_com_color(com_color);	//컴퓨터의 원래 진영 색 설정
+						print_state(gametree);					//보드 출력
+
+						if (eval == 100 || eval == -100)		//종료 조건
+							break;
+						cout << "=========================" << endl << endl;
+					}
+				}
+
+				// 4-2) 컴퓨터 선공
+				else
+				{
+					while (eval != 100 && eval != -100)
+					{
+						//컴퓨터 차례
+						cout << "===================================================" << endl;
+						cout << "COMPUTER" << endl;
+
+						eval = Move_Com_pawn(gametree);			//컴퓨터 말 이동
+						gametree->getRoot()->set_com_color(com_color);	//컴퓨터의 원래 진영 색 설정
+						print_state(gametree);					//보드 출력
+
+						if (eval == 100 || eval == -100)		//종료 조건
+							break;
+
+						cout << "===================================================" << endl << endl;
+
+
+						//유저 차례
+						eval = Move_User_pawn(gametree);		//유저 말 이동
+
+						cout << "===================================================" << endl;
+						cout << "USER" << endl;
+						print_state(gametree);					//보드 출력
+
+						if (eval == 100 || eval == -100)		//종료 조건
+							break;
+						cout << "===================================================" << endl << endl;
+					}
+
+				}
+
+
+				cout << "게임종료 -- ";
+
+
+				if (eval == 100)
+				{
+					if (get_user_color() == 'B')
+					{
+						cout << "HUMAN LOSS" << endl;
+
+					}
+					else
+					{
+						cout << "HUMAN WIN" << endl;
+					}
+				}
+				else
+				{
+					if (get_user_color() == 'B')
+					{
+						cout << "HUMAN WIN" << endl;
+					}
+					else
+					{
+						cout << "HUMAN LOSE" << endl;
+					}
+				}
+
+
+				while (1)
+				{
+					int again = 0;
+					cout << "Play more (1), Exit (2) : ";
+					cin >> again;
+
+					if (again == 1)
+					{
+						delete gametree;		//1을 선택 시 게임 다시 진행
+						system("cls");
+						break;
+					}
+
+					else if (again == 2)
+					{
+						delete gametree;		//2를 선택 시 게임 종료
+						return;
+					}
+
+					else
+					{
+						cout << "다시 입력해주시기 바랍니다." << endl;		//그 이외 선택 시에도 게임 종료
+					}
+				}
 			}
 		}
+		catch (const invalid_argument& e) {
+			cout << e.what() << endl;
 
+		}
+		catch (const exception& e) {
+			cout << e.what() << endl;
+		}
 	}
+	
 	
 	return;
 }
@@ -420,7 +422,6 @@ bool Manager::initialSetting(gameTree* pawn, char* file_name)
 	FILE* fp = fopen(file_name, "r");
 	char buf[3][3];
 
-
 	if (strcmp(file_name, "0") == 0)	//default 0을 눌렀을 때 default로 초기 state 지정
 	{
 		for (int i = 0; i < 3; i++)
@@ -439,7 +440,8 @@ bool Manager::initialSetting(gameTree* pawn, char* file_name)
 
 	else
 	{
-		if (fp == NULL) return false;	//파일이 존재 X
+		if (fp == NULL)	//파일이 존재 X
+			throw exception("파일이 존재하지 않습니다.");
 
 		for (int i = 0; i < 3; i++)
 		{
