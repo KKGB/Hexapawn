@@ -17,31 +17,31 @@
 ## 4. 진행 규칙
 ### 1) 색깔 선택
 <p align="center">
- <img src = "https://github.com/KKGB/Hexapawn/assets/69628911/ab4dbd78-f42a-4f65-9238-9b346f6ba7a0">
+ <img src = "https://github.com/KKGB/Hexapawn/assets/69628911/fe902e1f-9b17-4443-904f-b327f2718734">
 </p>
 <br>
 
 ### 2) 턴 선택
 <p align="center">
- <img src = "https://github.com/KKGB/Hexapawn/assets/69628911/1b620f83-a113-446e-9139-390c8bf53bd9">
+ <img src = "https://github.com/KKGB/Hexapawn/assets/69628911/b26113a8-141d-41f1-9d87-3c575ea08cb5">
 </p>
 <br>
 
 ### 3) 보드판 선택
 <p align="center">
- <img src = "https://github.com/KKGB/Hexapawn/assets/69628911/e45fc99c-6987-451b-b6b8-5a822ed09f96">
+ <img src = "https://github.com/KKGB/Hexapawn/assets/69628911/da7c2575-6d6f-4241-bdb0-d68770fddaa4">
 </p>
 <br>
 
 ### 4) 게임 진행
 <p align="center">
- <img src = "https://github.com/KKGB/Hexapawn/assets/69628911/80da1294-d051-4fe5-a038-b3b835162463">
+ <img src = "https://github.com/KKGB/Hexapawn/assets/69628911/50fd6099-71aa-4ff9-a1af-179eb57b1906">
 </p>
 <br>
 
 ### 5) 게임 종료
 <p align="center">
- <img src = "https://github.com/KKGB/Hexapawn/assets/69628911/ba7d3ac0-0bba-4507-812c-fa3ce6e1aef9">
+ <img src = "https://github.com/KKGB/Hexapawn/assets/69628911/8cfb9a5c-78f9-4331-a245-88e73fe73edc">
 </p>
 <br>
 
