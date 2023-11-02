@@ -98,6 +98,7 @@ void Manager::Game()
 			memset(buf, 0, sizeof(buf));
 			cout << "Input file name (default board=0): ";
 			cin >> buf;
+			cout << endl;
 
 			if (InitialSetting(gametree, buf))
 			{
@@ -113,26 +114,26 @@ void Manager::Game()
 					{
 						//유저 차례
 						eval = Move_User_pawn(gametree);		//유저 말 이동
+						cout << endl;
 
-						cout << "=========================" << endl;
-						cout << "USER" << endl;
+						cout << "===========USER============" << endl;
 						print_state(gametree);					//보드 출력
+						cout << "===========================" << endl << endl;
 
 						if (eval == 100 || eval == -100)		//종료 조건
 							break;
-						cout << "=========================" << endl << endl;
+						
 
 						//컴퓨터 차례
-						cout << "==========================" << endl;
-						cout << "COMPUTER" << endl;
-
 						eval = Move_Com_pawn(gametree);			//컴퓨터 말 이동
 						gametree->getRoot()->set_com_color(com_color);	//컴퓨터의 원래 진영 색 설정
+
+						cout << "=========COMPUTER==========" << endl;
 						print_state(gametree);					//보드 출력
+						cout << "===========================" << endl << endl;
 
 						if (eval == 100 || eval == -100)		//종료 조건
 							break;
-						cout << "=========================" << endl << endl;
 					}
 				}
 
@@ -142,29 +143,27 @@ void Manager::Game()
 					while (eval != 100 && eval != -100)
 					{
 						//컴퓨터 차례
-						cout << "===================================================" << endl;
-						cout << "COMPUTER" << endl;
-
 						eval = Move_Com_pawn(gametree);			//컴퓨터 말 이동
 						gametree->getRoot()->set_com_color(com_color);	//컴퓨터의 원래 진영 색 설정
+
+						cout << "=========COMPUTER==========" << endl;
 						print_state(gametree);					//보드 출력
+						cout << "===========================" << endl << endl;
 
 						if (eval == 100 || eval == -100)		//종료 조건
 							break;
-
-						cout << "===================================================" << endl << endl;
 
 
 						//유저 차례
 						eval = Move_User_pawn(gametree);		//유저 말 이동
+						cout << endl;
 
-						cout << "===================================================" << endl;
-						cout << "USER" << endl;
+						cout << "===========USER============" << endl;
 						print_state(gametree);					//보드 출력
+						cout << "===========================" << endl << endl;
 
 						if (eval == 100 || eval == -100)		//종료 조건
 							break;
-						cout << "===================================================" << endl << endl;
 					}
 
 				}
@@ -361,7 +360,8 @@ bool Manager::IsYourPawn(char* board, char* search_buf)
 	int i = *(search_buf + 0) - 49;
 	int j = *(search_buf + 2) - 49;
 
-	if (i < 3 && j < 3 && i >= 0 && j >= 0 && buf[i][j] != get_user_color())		//판 범위를 벗어나거나 선택한 색깔과 다른 경우(내 pawn이 아닌 경우)
+	// 보드판 안에 존재하고 내가 선택한 색깔일 때
+	if (i < 3 && j < 3 && i >= 0 && j >= 0 && buf[i][j] == get_user_color())
 		return true;
 
 	return false;
@@ -385,64 +385,68 @@ bool Manager::IsMovable(char* board, char* start, char* end)
 	int rowEnd = *(end + 0) - 49;
 	int colEnd = *(end + 2) - 49;			//이동 후 위치값
 
-	if (rowEnd < 3 && colEnd < 3 && rowEnd >= 0 && colEnd >= 0 && abs(colEnd - colStart) == 1 && abs(rowEnd - rowStart) == 1)	// 판 안에 존재할 때
-		return true;
+	// 보드판 안에 존재하고 이동거리가 1일 때
+	if (rowEnd < 3 && colEnd < 3 && rowEnd >= 0 && colEnd >= 0 && abs(colEnd - colStart) + abs(rowEnd - rowStart) <= 2)
+	{
+		if (get_user_color() == 'B')	//유저 == BLACK
+		{
+			if (buf[rowStart][colStart] == 'B' && (buf[rowEnd][colEnd] == '0' || buf[rowEnd][colEnd] == 'W'))	//빈 공간 이동 or 흰 돌을 잡을 때
+			{
+				if (rowEnd - rowStart == -1 && colEnd - colStart == 0 && buf[rowEnd][colEnd] == 'W')				//앞으로 가려고 할 때 흰 돌이 앞에 있는 경우 제외
+					return false;
+
+				if (rowStart - rowEnd == 0 && buf[rowEnd][colEnd] == 'W')											//양 옆으로 이동하려고 할 때 흰 돌이 양옆에 있는 경우 제외
+					return false;
+
+				if (rowStart < rowEnd)																				//뒤로 가는 경우 제외
+					return false;
+
+				if (rowEnd - rowStart == -1 && (colEnd - colStart == 1 || colEnd - colStart == -1) && buf[rowEnd][colEnd] == '0')	//대각선 빈공간 이동 제외
+					return false;
+
+				buf[rowStart][colStart] = '0';	//Start 위치 -> 빈공간
+				buf[rowEnd][colEnd] = 'B';		//End 위치 -> Pawn
+
+				gametree->getRoot()->setState(&buf[0][0]);	//Root에 State 저장
+				return true;
+			}
+
+			else
+				return false;
+		}
+
+		else							//유저 == WHITE
+		{
+			if (buf[rowStart][colStart] == 'W' && (buf[rowEnd][colEnd] == '0' || buf[rowEnd][colEnd] == 'B'))	//빈 공간 이동 or 검은 돌을 잡을 때
+			{
+				if (rowStart - rowEnd == -1 && colEnd - colStart == 0 && buf[rowEnd][colEnd] == 'B')				//앞으로 가려고 할 때 흰 돌이 앞에 있는 경우 제외
+					return false;
+
+				if (rowStart - rowEnd == 0 && buf[rowEnd][colEnd] == 'B')											//양 옆으로 이동하려고 할 때 흰 돌이 양옆에 있는 경우 제외
+					return false;
+
+				if (rowStart > rowEnd)																				//뒤로 가는 경우 제외
+					return false;
+
+				if (rowStart - rowEnd == -1 && (colEnd - colStart == 1 || colEnd - colStart == -1) && buf[rowEnd][colEnd] == '0')	//대각선 빈공간 이동 제외
+					return false;
+
+				buf[rowStart][colStart] = '0';	//Start 위치 -> 빈공간
+				buf[rowEnd][colEnd] = 'W';		//End 위치 -> Pawn
+
+				gametree->getRoot()->setState(&buf[0][0]);	//Root에 State 저장
+				return true;
+			}
+
+			else
+				return false;
+		}
+	}
+
 	else
 		return false;
 
-	if (get_user_color() == 'B')	//유저 == BLACK
-	{
-		if (buf[rowStart][colStart] == 'B' && (buf[rowEnd][colEnd] == '0' || buf[rowEnd][colEnd] == 'W'))	//빈 공간 이동 or 흰 돌을 잡을 때
-		{
-			if (rowEnd - rowStart == -1 && colEnd - colStart == 0 && buf[rowEnd][colEnd] == 'W')				//앞으로 가려고 할 때 흰 돌이 앞에 있는 경우 제외
-				return false;
-
-			if (rowStart - rowEnd == 0 && buf[rowEnd][colEnd] == 'W')											//양 옆으로 이동하려고 할 때 흰 돌이 양옆에 있는 경우 제외
-				return false;
-
-			if (rowStart < rowEnd)																				//뒤로 가는 경우 제외
-				return false;
-
-			if (rowEnd - rowStart == -1 && (colEnd - colStart == 1 || colEnd - colStart == -1) && buf[rowEnd][colEnd] == '0')	//대각선 빈공간 이동 제외
-				return false;
-
-			buf[rowStart][colStart] = '0';	//Start 위치 -> 빈공간
-			buf[rowEnd][colEnd] = 'B';		//End 위치 -> Pawn
-
-			gametree->getRoot()->setState(&buf[0][0]);	//Root에 State 저장
-			return true;
-		}
-
-		else
-			return false;
-	}
-
-	else							//유저 == WHITE
-	{
-		if (buf[rowStart][colStart] == 'W' && (buf[rowEnd][colEnd] == '0' || buf[rowEnd][colEnd] == 'B'))	//빈 공간 이동 or 검은 돌을 잡을 때
-		{
-			if (rowStart - rowEnd == -1 && colEnd - colStart == 0 && buf[rowEnd][colEnd] == 'B')				//앞으로 가려고 할 때 흰 돌이 앞에 있는 경우 제외
-				return false;
-
-			if (rowStart - rowEnd == 0 && buf[rowEnd][colEnd] == 'B')											//양 옆으로 이동하려고 할 때 흰 돌이 양옆에 있는 경우 제외
-				return false;
-
-			if (rowStart > rowEnd)																				//뒤로 가는 경우 제외
-				return false;
-
-			if (rowStart - rowEnd == -1 && (colEnd - colStart == 1 || colEnd - colStart == -1) && buf[rowEnd][colEnd] == '0')	//대각선 빈공간 이동 제외
-				return false;
-
-			buf[rowStart][colStart] = '0';	//Start 위치 -> 빈공간
-			buf[rowEnd][colEnd] = 'W';		//End 위치 -> Pawn
-
-			gametree->getRoot()->setState(&buf[0][0]);	//Root에 State 저장
-			return true;
-		}
-
-		else
-			return false;
-	}
+	
 }
 
 /// <summary>
