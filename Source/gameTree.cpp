@@ -15,6 +15,13 @@ gameTree::~gameTree()
 	}
 }
 
+/// <summary>
+/// 최대 최소 알고리즘에서 최댓값 관련 함수
+/// </summary>
+/// <param name="pTemp"></param>
+/// <param name="alpha"></param>
+/// <param name="beta"></param>
+/// <returns></returns>
 int gameTree::Max_Value(gameTreeNode* pTemp, int alpha, int beta)
 {
 	gameTreeNode* currRoot = pTemp;
@@ -29,19 +36,13 @@ int gameTree::Max_Value(gameTreeNode* pTemp, int alpha, int beta)
 	if (currRoot->getLevel() == 3)
 		return eval_value;
 
-	char current_state[3][3];		//현재 상태를 나타낼 배열
-	char next_state[3][3];			//다음 상태를 나타낼 배열
+	char current_state[3][3]{};		//현재 상태를 나타낼 배열
+	char next_state[3][3]{};			//다음 상태를 나타낼 배열
 
 	char com_color = 'W';			//MAX이므로 양수 값을 갖는 White를 노드의 색깔로 설정
 	char user_color = 'B';
 
-	memset(current_state[0], 0, 3);
-	memset(current_state[1], 0, 3);
-	memset(current_state[2], 0, 3);
-
-	memcpy(current_state, currRoot->getState(), 3 * 3);		//노드에 있는 State를 복사해옴
-
-
+	memcpy(current_state, currRoot->getState(), static_cast<size_t>(3) * 3);		//노드에 있는 State를 복사해옴
 
 	//MAX == 컴퓨터가 WHITE일 경우
 	for (int i = 0; i < 3; i++)
@@ -50,11 +51,11 @@ int gameTree::Max_Value(gameTreeNode* pTemp, int alpha, int beta)
 		{
 			if (current_state[i][j] == com_color)
 			{
-				if ((current_state[i + 1][j - 1] == user_color) && i < 2 && j > 0)			//왼쪽 대각선 아래에 유저 말 위치
+				if (i < 2 && j > 0 && current_state[i + 1][j - 1] == user_color)			//왼쪽 대각선 아래에 유저 말 위치
 				{
 					gameTreeNode* newNode = new gameTreeNode();
 					newNode->setState(&current_state[0][0]);
-					memcpy(next_state, newNode->getState(), 3 * 3);
+					memcpy(next_state, newNode->getState(), static_cast<size_t>(3) * 3);
 					next_state[i][j] = '0';	
 					next_state[i + 1][j - 1] = com_color;
 					newNode->setState(&next_state[0][0]);			//왼쪽 대각선 아래로 유저 말을 잡고 상태 저장
@@ -74,11 +75,11 @@ int gameTree::Max_Value(gameTreeNode* pTemp, int alpha, int beta)
 
 				}
 
-				if (current_state[i + 1][j + 1] == user_color && i < 2 && j < 2)	//오른쪽 대각선 아래 유저 말 위치
+				if (i < 2 && j < 2 && current_state[i + 1][j + 1] == user_color)	//오른쪽 대각선 아래 유저 말 위치
 				{
 					gameTreeNode* newNode = new gameTreeNode();	
 					newNode->setState(&current_state[0][0]);
-					memcpy(next_state, newNode->getState(), 3 * 3);
+					memcpy(next_state, newNode->getState(), static_cast<size_t>(3) * 3);
 					next_state[i][j] = '0';
 					next_state[i + 1][j + 1] = com_color;
 					newNode->setState(&next_state[0][0]);			//오른쪽 대각선 아래로 유저 말을 잡고 상태 저장
@@ -97,11 +98,11 @@ int gameTree::Max_Value(gameTreeNode* pTemp, int alpha, int beta)
 					}
 				}
 
-				if (current_state[i + 1][j] == '0' && i < 2)						//앞쪽이 비었을 때
+				if (i < 2 && current_state[i + 1][j] == '0')						//앞쪽이 비었을 때
 				{
 					gameTreeNode* newNode = new gameTreeNode();
 					newNode->setState(&current_state[0][0]);
-					memcpy(next_state, newNode->getState(), 3 * 3);
+					memcpy(next_state, newNode->getState(), static_cast<size_t>(3) * 3);
 					next_state[i][j] = '0';						
 					next_state[i + 1][j] = com_color;
 					newNode->setState(&next_state[0][0]);			//앞으로 이동 후 상태 저장
@@ -121,11 +122,11 @@ int gameTree::Max_Value(gameTreeNode* pTemp, int alpha, int beta)
 
 				}
 
-				if (current_state[i][j - 1] == '0' && j > 0)						//왼쪽이 비었을 때
+				if (j > 0 && current_state[i][j - 1] == '0')						//왼쪽이 비었을 때
 				{
 					gameTreeNode* newNode = new gameTreeNode();
 					newNode->setState(&current_state[0][0]);
-					memcpy(next_state, newNode->getState(), 3 * 3);
+					memcpy(next_state, newNode->getState(), static_cast<size_t>(3) * 3);
 					next_state[i][j] = '0';						
 					next_state[i][j - 1] = com_color;
 					newNode->setState(&next_state[0][0]);			//왼쪽으로 이동 후 상태 저장
@@ -144,11 +145,11 @@ int gameTree::Max_Value(gameTreeNode* pTemp, int alpha, int beta)
 					}
 				}
 
-				if (current_state[i][j + 1] == '0' && j < 2)						//오른쪽이 비었을 때
+				if (j < 2 && current_state[i][j + 1] == '0')						//오른쪽이 비었을 때
 				{
 					gameTreeNode* newNode = new gameTreeNode();
 					newNode->setState(&current_state[0][0]);
-					memcpy(next_state, newNode->getState(), 3 * 3);	
+					memcpy(next_state, newNode->getState(), static_cast<size_t>(3) * 3);
 					next_state[i][j] = '0';
 					next_state[i][j + 1] = com_color;
 					newNode->setState(&next_state[0][0]);			//오른쪽으로 이동 후 상태 저장
@@ -176,6 +177,13 @@ int gameTree::Max_Value(gameTreeNode* pTemp, int alpha, int beta)
 	return alpha;
 }
 
+/// <summary>
+/// 최대 최소 알고리즘에서 최솟값 관련 함수
+/// </summary>
+/// <param name="pTemp"></param>
+/// <param name="alpha"></param>
+/// <param name="beta"></param>
+/// <returns></returns>
 int gameTree::Min_Value(gameTreeNode* pTemp, int alpha, int beta)
 {
 	int temp = 0;
@@ -191,21 +199,14 @@ int gameTree::Min_Value(gameTreeNode* pTemp, int alpha, int beta)
 		return eval_value;
 
 
-	char current_state[3][3];		//현재 상태를 나타낼 배열
-	char next_state[3][3];			//다음 상태를 나타낼 배열
+	char current_state[3][3]{};		//현재 상태를 나타낼 배열
+	char next_state[3][3]{};			//다음 상태를 나타낼 배열
 
 	char com_color = 'B';
 	char user_color = 'W';
 
-	memset(current_state[0], 0, 3);
-	memset(current_state[1], 0, 3);
-	memset(current_state[2], 0, 3);
-
-
-	memcpy(current_state, currRoot->getState(), 3 * 3);
+	memcpy(current_state, currRoot->getState(), static_cast<size_t>(3) * 3);
 	
-
-
 	//MIN == 컴퓨터가 BLACK일 경우
 	for (int i = 0; i < 3; i++)
 	{
@@ -213,11 +214,11 @@ int gameTree::Min_Value(gameTreeNode* pTemp, int alpha, int beta)
 		{
 			if (current_state[i][j] == com_color)
 			{
-				if (current_state[i - 1][j - 1] == user_color && i > 0 && j > 0)	//왼쪽 대각선 위에 유저 말 위치
+				if (i > 0 && j > 0 && current_state[i - 1][j - 1] == user_color)	//왼쪽 대각선 위에 유저 말 위치
 				{
 					gameTreeNode* newNode = new gameTreeNode();					
 					newNode->setState(&current_state[0][0]);
-					memcpy(next_state, newNode->getState(), 3 * 3);	
+					memcpy(next_state, newNode->getState(), static_cast<size_t>(3) * 3);
 					next_state[i][j] = '0';						
 					next_state[i - 1][j - 1] = com_color;
 					newNode->setState(&next_state[0][0]);			//왼쪽 대각선 위로 이동 후 state 저장
@@ -236,11 +237,11 @@ int gameTree::Min_Value(gameTreeNode* pTemp, int alpha, int beta)
 					}
 				}
 
-				if (current_state[i - 1][j + 1] == user_color && i > 0 && j < 2)	//오른쪽 대각선 위에 유저 말 위치
+				if (i > 0 && j < 2 && current_state[i - 1][j + 1] == user_color)	//오른쪽 대각선 위에 유저 말 위치
 				{
 					gameTreeNode* newNode = new gameTreeNode();					
 					newNode->setState(&current_state[0][0]);
-					memcpy(next_state, newNode->getState(), 3 * 3);	
+					memcpy(next_state, newNode->getState(), static_cast<size_t>(3) * 3);
 					next_state[i][j] = '0';						
 					next_state[i - 1][j + 1] = com_color;
 					newNode->setState(&next_state[0][0]);			//오른쪽 대각선 위로 이동 후 state 저장
@@ -259,11 +260,11 @@ int gameTree::Min_Value(gameTreeNode* pTemp, int alpha, int beta)
 					}
 				}
 
-				if (current_state[i - 1][j] == '0' && i > 0)						//앞에 비어 있는 상태
+				if (i > 0 && current_state[i - 1][j] == '0')						//앞에 비어 있는 상태
 				{
 					gameTreeNode* newNode = new gameTreeNode();	
 					newNode->setState(&current_state[0][0]);
-					memcpy(next_state, newNode->getState(), 3 * 3);	
+					memcpy(next_state, newNode->getState(), static_cast<size_t>(3) * 3);
 					next_state[i][j] = '0';						
 					next_state[i - 1][j] = com_color;
 					newNode->setState(&next_state[0][0]);			//앞으로 이동 후 state 저장
@@ -282,11 +283,11 @@ int gameTree::Min_Value(gameTreeNode* pTemp, int alpha, int beta)
 					}
 				}
 
-				if (current_state[i][j - 1] == '0' && j > 0)						//왼쪽에 비어 있는 상태
+				if (j > 0 && current_state[i][j - 1] == '0')						//왼쪽에 비어 있는 상태
 				{
 					gameTreeNode* newNode = new gameTreeNode();
 					newNode->setState(&current_state[0][0]);
-					memcpy(next_state, newNode->getState(), 3 * 3);
+					memcpy(next_state, newNode->getState(), static_cast<size_t>(3) * 3);
 					next_state[i][j] = '0';						
 					next_state[i][j - 1] = com_color;
 					newNode->setState(&next_state[0][0]);			//왼쪽으로 이동 후 state 저장
@@ -305,11 +306,11 @@ int gameTree::Min_Value(gameTreeNode* pTemp, int alpha, int beta)
 					}
 				}
 
-				if (current_state[i][j + 1] == '0' && j < 2)						//오른쪽에 비어 있는 상태
+				if (j < 2 && current_state[i][j + 1] == '0')						//오른쪽에 비어 있는 상태
 				{
 					gameTreeNode* newNode = new gameTreeNode();
 					newNode->setState(&current_state[0][0]);
-					memcpy(next_state, newNode->getState(), 3 * 3);
+					memcpy(next_state, newNode->getState(), static_cast<size_t>(3) * 3);
 
 					next_state[i][j] = '0';
 					next_state[i][j + 1] = com_color;
@@ -338,6 +339,11 @@ int gameTree::Min_Value(gameTreeNode* pTemp, int alpha, int beta)
 	return beta;
 }
 
+/// <summary>
+/// 최종 단계를 고려하여 평가 함수의 결과를 계산하는 함수
+/// </summary>
+/// <param name="pTemp"></param>
+/// <returns></returns>
 int gameTree::Term(gameTreeNode* pTemp)
 {
 	int e_value = 0;
@@ -400,10 +406,15 @@ int gameTree::Term(gameTreeNode* pTemp)
 	return e_value;
 }
 
+/// <summary>
+/// 점수를 계산하는 평가 함수
+/// </summary>
+/// <param name="pTemp"></param>
+/// <returns></returns>
 int gameTree::Evaluation(gameTreeNode* pTemp)
 {
 	char board[3][3];
-	memcpy(board, pTemp->getState(), 3 * 3);
+	memcpy(board, pTemp->getState(), static_cast<size_t>(3) * 3);
 
 	int w_pawn = 0;
 	int b_pawn = 0;
@@ -438,21 +449,21 @@ int gameTree::Evaluation(gameTreeNode* pTemp)
 	return eval;
 }
 
+// gameTree의 Root에 관련 함수
 void gameTree::setRoot(gameTreeNode* Root)
 {
 	this->Root = Root;
 }
-
 gameTreeNode* gameTree::getRoot()
 {
 	return Root;
 }
 
+// gameTree의 현재 노드에 관련된 함수
 void gameTree::set_pCur(gameTreeNode* pCur)
 {
 	this->pCur = pCur;
 }
-
 gameTreeNode* gameTree::get_pCur()
 {
 	return pCur;

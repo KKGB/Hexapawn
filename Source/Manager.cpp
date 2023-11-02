@@ -13,7 +13,7 @@ Manager::Manager()
 Manager::~Manager(){}
 
 /// <summary>
-/// 헥사폰 게임 진행 함수
+/// 헥사폰 게임 턴 진행 함수
 /// </summary>
 /// <returns></returns>
 void Manager::Game()
@@ -99,7 +99,7 @@ void Manager::Game()
 			cout << "Input file name (default board=0): ";
 			cin >> buf;
 
-			if (initialSetting(gametree, buf))
+			if (InitialSetting(gametree, buf))
 			{
 				print_state(gametree);
 				char com_color = gametree->getRoot()->get_com_color();
@@ -237,6 +237,11 @@ void Manager::Game()
 	return;
 }
 
+/// <summary>
+/// 유저 턴에서 진행 함수
+/// </summary>
+/// <param name="pawn"></param>
+/// <returns></returns>
 int Manager::Move_User_pawn(gameTree* pawn)
 {
 	gameTreeNode* pc_Root = pawn->getRoot();
@@ -245,9 +250,11 @@ int Manager::Move_User_pawn(gameTree* pawn)
 	int term_value = 0;
 	char startPos[10];
 	char endPos[10];
+	char* row = NULL;
+	char* column = NULL;
 	char board[3][3];
 
-	memcpy(board, pc_Root->getState(), 3 * 3);
+	memcpy(board, pc_Root->getState(), static_cast<size_t>(3) * 3);
 
 	term_value = pawn->Term(pawn->getRoot());		//초기 상태에 이길 수 밖에 없는 파일을 읽어올 때 예외 처리
 
@@ -268,9 +275,11 @@ int Manager::Move_User_pawn(gameTree* pawn)
 
 	while (1)
 	{
-		cout << "ex) 1행 1열 -> 1,1 " << endl;
+		cout << "ex) 1행 1열 -> 1,1" << endl;
 		cin >> startPos;
-
+		row = strtok(startPos, ",");
+		column = strtok(NULL, " ");
+		
 		if (!IsYourPawn(&board[0][0], startPos))	//내 pawn이 아닌 경우
 		{
 			cout << endl;
@@ -282,8 +291,10 @@ int Manager::Move_User_pawn(gameTree* pawn)
 		{
 			cout << endl;
 			cout << "pawn을 어디다 두실건가요?" << endl;
-			cout << "ex) 2행 1열 -> 2,1 " << endl;
+			cout << "ex) 2행 1열 -> 2,1" << endl;
 			cin >> endPos;
+			row = strtok(endPos, ",");
+			column = strtok(NULL, " ");
 
 			if (!IsMovable(&board[0][0], startPos, endPos))		//원하는 곳으로 움직일 수 없는 경우
 			{
@@ -301,6 +312,11 @@ int Manager::Move_User_pawn(gameTree* pawn)
 	return term_value;
 }
 
+/// <summary>
+/// 컴퓨터 턴에서 진행 함수
+/// </summary>
+/// <param name="pawn"></param>
+/// <returns></returns>
 int Manager::Move_Com_pawn(gameTree* pawn)
 {
 	int term_value = 0;
@@ -319,7 +335,6 @@ int Manager::Move_Com_pawn(gameTree* pawn)
 		return term_value;
 	}
 
-	//move computer pawn
 	if (get_user_color() == 'B')
 		term_value = pawn->Max_Value(pawn->getRoot(), -200, 200);
 	else
@@ -327,30 +342,42 @@ int Manager::Move_Com_pawn(gameTree* pawn)
 
 	pawn->setRoot(pawn->get_pCur());
 	pawn->getRoot()->setLevel(0);
-	//term_value 100 is white win, -100 is black win
 
 	term_value = pawn->Term(pawn->getRoot());
 	return term_value;
 }
 
+/// <summary>
+/// 선택한 폰이 내 폰이 맞는지 확인하는 함수
+/// </summary>
+/// <param name="board"></param>
+/// <param name="search_buf"></param>
+/// <returns></returns>
 bool Manager::IsYourPawn(char* board, char* search_buf)
 {
 	char buf[3][3];
-	memcpy(buf, board, 3 * 3);
+	memcpy(buf, board, static_cast<size_t>(3) * 3);
 
 	int i = *(search_buf + 0) - 49;
 	int j = *(search_buf + 2) - 49;
 
-	if (i > 3 || j > 3 || i < 0 || j < 0 || buf[i][j] != get_user_color())		//판 범위를 벗어나거나 선택한 색깔과 다른 경우(내 pawn이 아닌 경우)
-		return false;
+	if (i < 3 && j < 3 && i >= 0 && j >= 0 && buf[i][j] != get_user_color())		//판 범위를 벗어나거나 선택한 색깔과 다른 경우(내 pawn이 아닌 경우)
+		return true;
 
-	return true;
+	return false;
 }
 
+/// <summary>
+/// 선택한 폰을 움직일 수 있는지 확인하는 함수
+/// </summary>
+/// <param name="board"></param>
+/// <param name="start"></param>
+/// <param name="end"></param>
+/// <returns></returns>
 bool Manager::IsMovable(char* board, char* start, char* end)
 {
 	char buf[3][3];
-	memcpy(buf, board, 3 * 3);
+	memcpy(buf, board, static_cast<size_t>(3) * 3);
 
 	int rowStart = *(start + 0) - 49;
 	int colStart = *(start + 2) - 49;		//이동 전 위치값
@@ -358,9 +385,10 @@ bool Manager::IsMovable(char* board, char* start, char* end)
 	int rowEnd = *(end + 0) - 49;
 	int colEnd = *(end + 2) - 49;			//이동 후 위치값
 
-	if (rowEnd > 3 || colEnd > 3 || rowEnd < 0 || colEnd < 0 || abs(colEnd - colStart) > 1 || abs(rowEnd - rowStart) > 1)	// 한칸 이상 움직이거나 판을 벗어날 때
+	if (rowEnd < 3 && colEnd < 3 && rowEnd >= 0 && colEnd >= 0 && abs(colEnd - colStart) == 1 && abs(rowEnd - rowStart) == 1)	// 판 안에 존재할 때
+		return true;
+	else
 		return false;
-
 
 	if (get_user_color() == 'B')	//유저 == BLACK
 	{
@@ -417,12 +445,19 @@ bool Manager::IsMovable(char* board, char* start, char* end)
 	}
 }
 
-bool Manager::initialSetting(gameTree* pawn, char* file_name)
+/// <summary>
+/// 맵 초기 설정 관련 함수
+/// </summary>
+/// <param name="pawn"></param>
+/// <param name="file_name"></param>
+/// <returns></returns>
+bool Manager::InitialSetting(gameTree* pawn, char* file_name)
 {
 	FILE* fp = fopen(file_name, "r");
-	char buf[3][3];
-
-	if (strcmp(file_name, "0") == 0)	//default 0을 눌렀을 때 default로 초기 state 지정
+	char buf[3][3]{};
+	
+	// 기본 맵
+	if (strcmp(file_name, "0") == 0)
 	{
 		for (int i = 0; i < 3; i++)
 		{
@@ -438,9 +473,10 @@ bool Manager::initialSetting(gameTree* pawn, char* file_name)
 		}
 	}
 
+	// 커스텀 맵
 	else
 	{
-		if (fp == NULL)	//파일이 존재 X
+		if (fp == NULL)
 			throw exception("파일이 존재하지 않습니다.\n");
 
 		for (int i = 0; i < 3; i++)
@@ -466,11 +502,15 @@ bool Manager::initialSetting(gameTree* pawn, char* file_name)
 	return true;
 }
 
+/// <summary>
+/// CLI에 상태 출력 관련 함수
+/// </summary>
+/// <param name="pawn"></param>
 void Manager::print_state(gameTree* pawn)
 {
-	char buf[3][3];
+	char buf[3][3]{};
 
-	memcpy(buf, pawn->getRoot()->getState(), 3 * 3);		//root 노드에 있는 state 복사
+	memcpy(buf, pawn->getRoot()->getState(), static_cast<size_t>(3) * 3);		//root 노드에 있는 state 복사
 
 	for (int i = 0; i < 3; i++)
 	{

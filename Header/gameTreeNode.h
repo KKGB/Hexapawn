@@ -5,10 +5,10 @@
 class gameTreeNode
 {
 private:
-	int level;				//트리에서 level을 나타냄
-	int eval;				//평가값을 의미
-	char com_color;			//컴퓨터의 pawn 색깔
-	char state[3][3];		//트리에서 노드의 state
+	int level;				// gameTree에서 Level을 나타냄
+	int eval;				// 평가함수 결과값
+	char com_color;			// 인공지능의 폰 색깔
+	char state[3][3];		// gameTree에서 노드의 state
 	
 
 public:
