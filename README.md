@@ -1,6 +1,10 @@
 # Hexapawn
 ## 1. 내용
 알파 베타 프루닝 기법을 이용하여 최대 최소 알고리즘을 최적화시킨 헥사폰 게임 구현 <br><br>
+<p align="center">
+ <img src = "https://github.com/KKGB/Hexapawn/assets/69628911/659e563e-8e8e-4f89-b7a7-b1eae6057637">
+</p>
+<br>
 
 ## 2. 구성 요소
 1) 3x3 보드판
